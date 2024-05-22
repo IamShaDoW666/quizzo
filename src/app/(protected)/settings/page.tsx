@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lock } from "lucide-react";
 import { auth, signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export default async function Settings() {
-  const session = await auth();    
-  return (  
+  const session = await auth();
+  return (
     <div className="py-12 max-w-6xl mx-auto">
       <Card>
         <CardHeader>
@@ -19,10 +20,17 @@ export default async function Settings() {
             </div>
             <p>{JSON.stringify(session)}</p>
             <div className="py-4">
+              {session?.user.image && (
+                <Avatar>
+                  <AvatarImage src={session?.user.image!} />
+                  <AvatarFallback></AvatarFallback>
+                </Avatar>
+              )}
+
               <form
                 action={async () => {
                   "use server";
-                  await signOut({redirectTo: "/auth/login"});
+                  await signOut({ redirectTo: "/auth/login" });
                 }}
               >
                 <Button type="submit">Sign Out</Button>
@@ -33,5 +41,4 @@ export default async function Settings() {
       </Card>
     </div>
   );
-};
-
+}

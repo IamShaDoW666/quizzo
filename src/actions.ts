@@ -6,6 +6,8 @@ import { db } from "@/lib/db";
 import { signIn } from "@/auth";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { AuthError } from "next-auth";
+import { generateVerificationToken } from "./lib/tokens";
+import { getUserByEmail } from "./lib/data/user";
 
 export const loginAction = async (values: z.infer<typeof loginSchema>) => {
   const validatedFields = loginSchema.safeParse(values);
@@ -15,6 +17,18 @@ export const loginAction = async (values: z.infer<typeof loginSchema>) => {
   }
 
   const { email, password } = validatedFields.data;
+
+  const existingUser = await getUserByEmail(email);
+  if (!existingUser || !existingUser.email || !existingUser.password) {
+    return { error: "Email does not exist!" };
+  }
+
+  if (!existingUser.emailVerified) {
+    const verificationToken = await generateVerificationToken(
+      existingUser.email
+    );
+    return { success: "Verification Email Sent!" };
+  }
 
   try {
     await signIn("credentials", {
@@ -44,7 +58,7 @@ export const registerAction = async (
     return { error: "Invalid Fields!" };
   }
 
-  const { email, confirmPassword, password } = validatedFields.data;
+  const { email, password } = validatedFields.data;
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const existingUser = await db.user.findUnique({ where: { email } });
@@ -61,6 +75,7 @@ export const registerAction = async (
   });
 
   // TODO: Send email for verification
+  const verificationToken = await generateVerificationToken(email);
 
-  return { message: "User account created!" };
+  return { message: "Verification Email Sent!" };
 };
