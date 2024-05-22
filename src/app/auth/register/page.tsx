@@ -27,6 +27,7 @@ import { useTransition, useState } from "react";
 import { registerAction } from "@/actions";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
+import SocialLogin from "@/components/social-login";
 
 export default function LoginForm() {
   const [isPending, startTransition] = useTransition();
@@ -116,9 +117,7 @@ export default function LoginForm() {
                   <Button disabled={isPending} type="submit" className="w-full">
                     Create an account
                   </Button>
-                  <Button variant="outline" className="w-full">
-                    Sign up with GitHub
-                  </Button>
+                  <SocialLogin />
                 </div>
               </form>
             </Form>

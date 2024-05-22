@@ -8,8 +8,10 @@ import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { AuthError } from "next-auth";
 import { generateVerificationToken } from "./lib/tokens";
 import { getUserByEmail } from "./lib/data/user";
+import { sendVerificationEmail } from "./lib/mail";
 
 export const loginAction = async (values: z.infer<typeof loginSchema>) => {
+  console.log(process.env.requireEmailVerification);
   const validatedFields = loginSchema.safeParse(values);
 
   if (!validatedFields.success) {
@@ -23,11 +25,17 @@ export const loginAction = async (values: z.infer<typeof loginSchema>) => {
     return { error: "Email does not exist!" };
   }
 
-  if (!existingUser.emailVerified) {
-    const verificationToken = await generateVerificationToken(
-      existingUser.email
-    );
-    return { success: "Verification Email Sent!" };
+  if (process.env.REQUIRE_EMAIL_VERIFICATION == "true") {
+    if (!existingUser.emailVerified) {
+      const verificationToken = await generateVerificationToken(
+        existingUser.email
+      );
+      await sendVerificationEmail(
+        verificationToken.email,
+        verificationToken.token
+      );
+      return { success: "Verification Email Sent!" };
+    }
   }
 
   try {
@@ -74,8 +82,14 @@ export const registerAction = async (
     },
   });
 
-  // TODO: Send email for verification
-  const verificationToken = await generateVerificationToken(email);
-
-  return { message: "Verification Email Sent!" };
+  //Send email for verification
+  if (process.env.REQUIRE_EMAIL_VERIFICATION == "true") {
+    const verificationToken = await generateVerificationToken(email);
+    await sendVerificationEmail(
+      verificationToken.email,
+      verificationToken.token
+    );
+    return { message: "Verification Email Sent!" };
+  }
+  return { message: "User account created!" };
 };

@@ -19,6 +19,9 @@ export const {
   },
   callbacks: {
     async signIn({ user, account }) {
+      if (process.env.REQUIRE_EMAIL_VERIFICATION == "false") {
+        return true
+      }
       //Allow all auth without email verification
       if (account?.provider !== "credentials") return true;
 
