@@ -1,3 +1,4 @@
+import { QuestionMarkIcon } from '@radix-ui/react-icons';
 import {
   AlertTriangle,
   ArrowRight,
@@ -30,6 +31,7 @@ import {
   UserX2Icon,
   X
 } from 'lucide-react';
+import { FaQuestionCircle } from 'react-icons/fa';
 
 export type Icon = LucideIcon;
 
@@ -46,6 +48,8 @@ export const Icons = {
   trash: Trash,
   employee: UserX2Icon,
   post: FileText,
+  question: QuestionMarkIcon,
+  addQuestion: FaQuestionCircle,
   page: File,
   media: Image,
   settings: Settings,

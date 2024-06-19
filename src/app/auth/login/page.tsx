@@ -15,7 +15,6 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -43,19 +42,19 @@ export default function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
 
-  function submit(values: z.infer<typeof loginSchema>) {
-    startTransition(() => {
-      loginAction(values)
-        .then((data) => {
-          setError(data?.error);
-          setSuccess(data?.success)
-        })
-        .catch((error: { error: string }) => {
-          alert(error);
-          setError(error.error);
-        });
-    });
-  }
+    function submit(values: z.infer<typeof loginSchema>) {
+      startTransition(() => {
+        loginAction(values)
+          .then((data) => {
+            setError(data?.error);
+            setSuccess(data?.success)
+          })
+          .catch((error: { error: string }) => {
+            alert(error);
+            setError(error.error);
+          });
+      });
+    }
 
   return (
     <div className="py-12">
