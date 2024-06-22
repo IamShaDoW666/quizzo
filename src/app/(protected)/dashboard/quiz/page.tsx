@@ -17,8 +17,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { db } from "@/lib/db";
-import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import QuizActions from "@/components/quiz-actions";
 
 const QuizList = async () => {
   const allQuiz = await db.quiz.findMany();
@@ -47,6 +47,7 @@ const QuizList = async () => {
           <TableRow>
             <TableHead>ID</TableHead>
             <TableHead>Name</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -54,6 +55,9 @@ const QuizList = async () => {
             <TableRow>
               <TableCell className="font-medium">{idx + 1}</TableCell>
               <TableCell>{quiz.title}</TableCell>
+              <TableCell>
+                <QuizActions quiz={quiz} />              
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

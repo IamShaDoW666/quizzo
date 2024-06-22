@@ -35,3 +35,19 @@ export const quizCreateSchema = z.object({
     message: "Description is required!"
   })
 });
+
+export const quizUpdateSchema = z.object({
+  id: z.string(),
+  title: z.string().min(1, {
+    message: "Title is required!"
+  }),
+  description: z.string().min(1, {
+    message: "Description is required!"
+  })
+});
+
+export const quizDeleteSchema = z.object({
+  id: z.string().min(1, {
+    message: "Title is required!"
+  })
+});
