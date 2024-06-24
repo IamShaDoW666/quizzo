@@ -60,8 +60,9 @@ model Quiz {
   title       String
   description String     @db.Text
   questions   Question[]
-  author      User?       @relation(fields: [authorId], references: [id])
+  author      User?      @relation(fields: [authorId], references: [id])
   authorId    String?
+  timer       Int?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
@@ -69,8 +70,18 @@ model Quiz {
 model Question {
   id        String   @id @default(cuid())
   title     String   @db.Text
+  marks     Int      @default(0)
   quiz      Quiz     @relation(fields: [quizId], references: [id])
   quizId    String
+  options   Option[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Option {
+  id         String   @id @default(cuid())
+  title      String   @db.Text
+  correct    Boolean  @default(false)
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
 }

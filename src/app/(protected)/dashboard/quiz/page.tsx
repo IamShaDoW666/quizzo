@@ -11,7 +11,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -52,7 +51,7 @@ const QuizList = async () => {
         </TableHeader>
         <TableBody>
           {allQuiz.map((quiz, idx) => (
-            <TableRow>
+            <TableRow key={quiz.id}>
               <TableCell className="font-medium">{idx + 1}</TableCell>
               <TableCell>{quiz.title}</TableCell>
               <TableCell>

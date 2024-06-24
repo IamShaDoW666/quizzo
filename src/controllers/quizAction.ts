@@ -14,7 +14,7 @@ export const createQuiz = async (values: z.infer<typeof quizCreateSchema>) => {
         authorId: session?.user?.id,
     }})
     if (quiz.id) {
-        return {success: "Quiz Created Successfully!"}
+        return {success: "Question Created Successfully!"}
     } else {
         return {error: "Internal Server Error!"}
     }

@@ -129,5 +129,11 @@ export const navItems: NavItem[] = [
     href: "/dashboard/quiz/create",
     icon: "addQuestion",
     label: "addQuestion",
+  },
+  {
+    title: "Questions",
+    href: "/dashboard/questions",
+    icon: "addQuestion",
+    label: "addQuestion",
   }
 ];

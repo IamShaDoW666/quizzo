@@ -1,60 +1,46 @@
 "use client";
+import React, { useState, useTransition } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "./ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { useEffect, useState, useTransition } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Quiz } from "@prisma/client";
 import { useForm } from "react-hook-form";
+import { questionCreateSchema } from "@/schema/formSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import React from "react";
-import { quizUpdateSchema } from "@/schema/formSchema";
-import { FormError } from "@/components/form-error";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+  } from "@/components/ui/form";
+  import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
-import { Quiz as QuizType } from "@prisma/client";
-import { updateQuiz } from "@/controllers/quizAction";
-
-const Quiz = ({ params }: { params: { id: string } }) => {
+import { createQuestion } from "@/controllers/questionAction";
+const CreateQuestionModal = ({ quiz }: { quiz: Quiz }) => {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
-  const form = useForm<z.infer<typeof quizUpdateSchema>>({
-    resolver: zodResolver(quizUpdateSchema),
+  const form = useForm<z.infer<typeof questionCreateSchema>>({
+    resolver: zodResolver(questionCreateSchema),
+    defaultValues: {
+        quizId: quiz.id,
+    }
   });
 
-  const getQuiz = async (id: string) => {
-    const res: QuizType  = await (await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/quiz/${id}`)).json()    
-    form.setValue("id", res.id)  
-    form.setValue("title", res.title)  
-    form.setValue("description", res.description)  
-  }
-
-  
-  useEffect(() => {
-    getQuiz(params.id)    
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  
-
-  function submit(values: z.infer<typeof quizUpdateSchema>) {
+  function create(values: z.infer<typeof questionCreateSchema>) {
     startTransition(() => {
       // Todo: make action
-      updateQuiz(values)
+      createQuestion(values)
         .then((data) => {
           setError(data?.error);
           setSuccess(data?.success);
@@ -67,16 +53,19 @@ const Quiz = ({ params }: { params: { id: string } }) => {
   }
 
   return (
-    <div className="p-12">
-      <Card>
-        <CardHeader>
-          <CardTitle>Quiz Name</CardTitle>
-          <CardDescription>Give a unique name for your quiz</CardDescription>
-        </CardHeader>
-        <CardContent>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button size={"sm"}>Add Question</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add a question</DialogTitle>
+          <DialogDescription>
+            Add a new question to the quiz {quiz.title}
+          </DialogDescription>
           <div className="grid gap-12">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(submit)}>
+              <form onSubmit={form.handleSubmit(create)}>
                 <div className="grid gap-2">
                   <FormField
                     control={form.control}
@@ -86,7 +75,7 @@ const Quiz = ({ params }: { params: { id: string } }) => {
                         <FormLabel>Title</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Quiz Title"
+                            placeholder="Question"
                             {...field}
                             disabled={isPending}
                           />
@@ -99,14 +88,16 @@ const Quiz = ({ params }: { params: { id: string } }) => {
                 <div className="grid gap-2">
                   <FormField
                     control={form.control}
-                    name="description"
+                    name="marks"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>Marks</FormLabel>
                         <FormControl>
-                          <Textarea
-                            placeholder="Enter description"
+                        <Input
+                            placeholder="Marks"
+                            type="number"                            
                             {...field}
+                            onChange={(e) => form.setValue('marks', Number(e.target.value))}
                             disabled={isPending}
                           />
                         </FormControl>
@@ -119,16 +110,16 @@ const Quiz = ({ params }: { params: { id: string } }) => {
                 <FormSuccess message={success} />
                 <div className="py-4">
                   <Button disabled={isPending} type="submit">
-                    Update
+                    Create
                   </Button>
                 </div>
               </form>
             </Form>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-export default Quiz;
+export default CreateQuestionModal;
